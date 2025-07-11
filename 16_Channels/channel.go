@@ -26,7 +26,34 @@ func task(done chan bool) {
 	fmt.Println("Processing.....")
 }
 func main() {
-	// Un-Buffer channels --> limited amount off we can send
+
+	// chan1 := make(<-chan int)  // Received-only type channel, can't send data on this channels
+	// chan2 := make(chan<- string)  // Send type channel, can't receive data from this channel.
+
+	chan1 := make(chan int)
+	chan2 := make(chan string)
+
+	go func() {
+		chan1 <- 1
+	}()
+
+	go func() {
+		//Send data to the channels
+		chan2 <- "Pong"
+	}()
+
+	for i := 1; i <= 2; i++ {
+
+		select {
+		case chan1Val := <-chan1:
+			fmt.Println("Received data from chan1", chan1Val)
+
+		case chan2Val := <-chan2:
+			fmt.Println("Received data from chan2", chan2Val)
+		}
+	}
+
+	/*// Un-Buffer channels --> limited amount off we can send
 	emailChan := make(chan string, 100)
 	emailChan <- "1@gmail.com"
 	emailChan <- "2@gmail.com"
@@ -34,7 +61,7 @@ func main() {
 
 	fmt.Println(<-emailChan)
 	fmt.Println(<-emailChan)
-	fmt.Println(<-emailChan)
+	fmt.Println(<-emailChan) */
 
 	// This is buffer channels --> Means at one time send one value & receive also same.
 	/* done := make(chan bool)
